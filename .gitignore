@@ -36,6 +36,7 @@ windows
 macos 
 analysis_options.yaml
 pubspec.lock
+README.md
 
 # Symbolication related
 app.*.symbols
