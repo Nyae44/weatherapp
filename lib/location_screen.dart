@@ -1,6 +1,7 @@
 // ignore_for_file: use_key_in_widget_constructors, library_private_types_in_public_api, prefer_const_constructors, prefer_typing_uninitialized_variables, prefer_const_constructors_in_immutables, unused_local_variable, unnecessary_null_in_if_null_operators
 
 import 'package:flutter/material.dart';
+import 'package:weatherapp/city_screen.dart';
 import 'constants.dart';
 import 'weather.dart';
 
@@ -26,12 +27,21 @@ class _LocationScreenState extends State<LocationScreen> {
   }
 
   void updateUI(dynamic weatherData) {
-    double temp = weatherData["main"]["temp"];
-    temperature = temp.toInt();
-    var condition = weatherData["weather"][0]["id"];
-    weatherIcon = weather.getWeatherIcon(condition);
-    weatherMessage = weather.getMessage(temperature ?? 0);
-    cityName = weatherData["name"];
+    setState(() {
+      if (weatherData == null) {
+        temperature = 0;
+        weatherIcon = 'Error';
+        weatherMessage = 'Unable to get weather data';
+        cityName = '';
+        return;
+      }
+      double temp = weatherData["main"]["temp"];
+      temperature = temp.toInt();
+      var condition = weatherData["weather"][0]["id"];
+      weatherIcon = weather.getWeatherIcon(condition);
+      weatherMessage = weather.getMessage(temperature ?? 0);
+      cityName = weatherData["name"];
+    });
   }
 
   @override
@@ -66,7 +76,20 @@ class _LocationScreenState extends State<LocationScreen> {
                     ),
                   ),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      var typedName = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: ((context) {
+                            return CityScreen();
+                          }),
+                        ),
+                      );
+                      if (typedName != null) {
+                        var weatherData =
+                            await weather.getCityWeather(typedName);
+                      }
+                    },
                     child: Icon(
                       Icons.location_city,
                       size: 50.0,
